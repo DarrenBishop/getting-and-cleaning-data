@@ -1,12 +1,16 @@
 # Study Design
-The raw data has been summarized by taking the mean and standard-deviation features 
+The raw data has been summarized by taking the mean and standard-deviation features and averaging those across all windows, grouped by subject and activity.
+
+Thus there are 180 observations; 1 for each of the 6 activities for each of the 30 subjects
 
 # Code Book
 
 ## File format
-
 The output file, tidy_data.txt, is a space delimited, wide format file.
-There are 88 variables and 180 observations with a header row; each variable is described below
+
+It contains 181 lines; 180 observations, as described above, with preceeded by one header row
+
+Each variable is described below
 
 ## Variables
 1. subject
