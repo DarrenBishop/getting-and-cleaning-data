@@ -1,21 +1,25 @@
 # Study Design
-The raw data has been summarized by taking the mean and standard-deviation features and averaging those across all windows, grouped by subject and activity.
+The raw data has been subset by taking the mean and standard-deviation pairs, where present, of the measured and estimates/derived variables e.g. _tBodyAcc-mean()_ and _tBodyAcc-std()_, but not _angle(tBodyAccMean,gravity)_.
 
-Thus there are 180 observations; 1 for each of the 6 activities for each of the 30 subjects
+Each observation is then enriched with the corresponding subject and activity; the activity variable is transformed into a factor-variable, giving more descriptive categorical values.
+
+This subset is then summarized by taking the average of the measured/estimate/derived variable across all windows, grouped by the enriched subject and activity variables, in that order.
+
+Thus there are 180 observations; 1 for each of the 6 activities for each of the 30 subjects.
 
 # Code Book
 
 ## File format
-The output file, tidy_data.txt, is a space delimited, wide format file.
+The output file, **tidy_data.txt**, is a space delimited, wide format file.
 
-It contains 181 lines; 180 observations, as described above, with preceeded by one header row
+It contains 181 lines; 180 observations, as described above, preceeded by one header row
 
 Each variable is described below
 
 ## Variables
 1. subject
  - Integer
- - Categorical: 1-30
+ - Categorical: 1 to 30
  - Identifies the subject (person carrying out the actvity) of this observation
 2. activity
  - Factor
@@ -337,10 +341,3 @@ Each variable is described below
  - Decimal
  - Continuous
  - Frequency domain mean-frequency magnitude Bodybody jerk rotation
-82. angle(tBodyAccMean,gravity)
-83. angle(tBodyAccJerkMean),gravityMean)
-84. angle(tBodyGyroMean,gravityMean)
-85. angle(tBodyGyroJerkMean,gravityMean)
-86. angle(X,gravityMean)
-87. angle(Y,gravityMean)
-88. angle(Z,gravityMean)
