@@ -27,41 +27,38 @@ get_data_set <- function() {
 }
 
 bind_data_set <- function(data_set, feature_names) {
-  
-  print(paste("Limit", limit, sep = "="))
-  
-  path = paste("UCI HAR Dataset/", data_set, "/", sep = "")
-  
-  col_classes = c("numeric")
-  subjects_file_name = paste(path, "subject_", data_set, ".txt", sep = "")
-  subjects = read.csv(subjects_file_name, header = F, col.names = c("subject"), colClasses = col_classes, nrows = limit)
-  #subjects = read.fwf(subjects_file_name, c(2), col.names = c("subject"), n = limit)
-  
-  col_classes = c("factor")
-  activities_file_name = paste(path, "y_", data_set, ".txt", sep = "")
-  #activities = read.csv(activities_file_name, header = F, col.names = c("activity"), colClasses = col_classes, nrows = limit)
-  activities = read.fwf(activities_file_name, c(2), col.names = c("activity"), colClasses = col_classes, n = limit)
-  
-  field_types = setNames(rep("REAL", length(feature_names)), feature_names)
-  
-  widths = rep(16, 561)
-  length = cumsum(widths)
-  start = length - widths + 1
-  columns = feature_names
-  
-  sql = paste("select", 
-              paste("cast(substr(V1, ", start, ", ",
-                    widths, ") as REAL) `", columns, "`", 
-                    sep = "", collapse = ", "), 
-              "from features_file limit", limit, sep = " ")
-  
-  features_file_name = paste(path, "X_", data_set, ".txt", sep = "")
-  features_file = file(features_file_name)
-  
-  features = sqldf(sql, file.format = list(sep = "_", header = F))
-  #features = read.csv.sql(features_file_name, header = F, field.types = field_types, colClasses = col_classes, sep = "", n = limit)
-  
-  bind_cols(subjects, activities, features)
+    
+    print(paste("Limit", limit, sep = "="))
+    
+    path = paste("UCI HAR Dataset/", data_set, "/", sep = "")
+    
+    col_classes = c("numeric")
+    subjects_file_name = paste(path, "subject_", data_set, ".txt", sep = "")
+    subjects = read.csv(subjects_file_name, header = F, col.names = c("subject"), colClasses = col_classes, nrows = limit)
+    
+    col_classes = c("factor")
+    activities_file_name = paste(path, "y_", data_set, ".txt", sep = "")
+    activities = read.fwf(activities_file_name, c(2), col.names = c("activity"), colClasses = col_classes, n = limit)
+    
+    field_types = setNames(rep("REAL", length(feature_names)), feature_names)
+    
+    widths = rep(16, 561)
+    length = cumsum(widths)
+    start = length - widths + 1
+    columns = feature_names
+    
+    sql = paste("select",
+                paste("cast(substr(V1, ", start, ", ",
+                      widths, ") as REAL) `", columns, "`",
+                      sep = "", collapse = ", "),
+                "from features_file limit", limit, sep = " ")
+    
+    features_file_name = paste(path, "X_", data_set, ".txt", sep = "")
+    features_file = file(features_file_name)
+    
+    features = sqldf(sql, file.format = list(sep = "_", header = F))
+    
+    bind_cols(subjects, activities, features)
 }
 
 get_data_set()
@@ -82,13 +79,15 @@ gc(verbose = T)
 
 print("Merge training and test data")
 
-df = bind_rows(trainDf, testDf)
+# Merge training and test data
 
-df$activity = factor(df$activity, levels = 1:6, labels = c("WALKING", "WALKING_UPSTAIRS", "WALKING_DOWNSTAIRS", "SITTING", "STANDING", "LAYING"))
+dt = tbl_df(bind_rows(trainDf, testDf))
+
+dt$activity = factor(dt$activity, levels = 1:6, labels = c("WALKING", "WALKING_UPSTAIRS", "WALKING_DOWNSTAIRS", "SITTING", "STANDING", "LAYING"))
 
 # From the data set in step 4, creates a second, independent tidy data set with
 # the average of each variable for each activity and each subject.
 
-tdf = df %>% select(subject, activity, matches("(mean|std)")) %>% group_by(subject, activity) %>% summarise_each(funs(mean))
+dts = dt %>% select(subject, activity, matches("(mean|std)\\(\\)")) %>% group_by(subject, activity) %>% summarise_each(funs(mean))
 
-write.table(tdf, file = "tidy_data_set.txt", row.name = F)
+write.table(dts, file = "tidy_data_set.txt", row.name = F)
